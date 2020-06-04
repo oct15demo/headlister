@@ -1,18 +1,18 @@
-# headlister
-run_head_lister.sh(1)                                    run_head_lister.sh(1)
+    run_head_lister.sh(1)                                    run_head_lister.sh(1)
 
+    NAME
 
-
-NAME
        run_head_lister.sh  -  output in data structure first lines of multiple
        .txt files until line length meets or exceeds threshold
 
-SYNOPSIS
+    SYNOPSIS
+
        run_head_lister.sh [ -h | -help ] 'lines_per_file' [  'number_of_files'
        |  -a | --all ] [ -l 'min_line_length' ] [ -i 'input_file' ] [ -o 'out-
        put_file' ] [ -ls-f ]
 
-DESCRIPTION
+    DESCRIPTION
+
        run_head_lister.sh displays in a data structure the first lines of mul-
        tiple  .txt  files  until  line length meets or exceeds threshold, each
        record includes the file name, a list of line lengths, and  a  list  of
@@ -107,7 +107,7 @@ DESCRIPTION
        as in ~/data/my_input_file or ~/data/my_output_file
 
 
-EXAMPLE
+    EXAMPLE
        
     $ run_head_lister.sh 3 3 
     
@@ -181,10 +181,12 @@ EXAMPLE
     python3 dir/head_lister.py stdin 3 60 stdout
 
 
-SEE ALSO
+    SEE ALSO
+        
         head (1),
 
-BUGS
+    BUGS
+          
           Assumes  on  a  Mac,  python  3  is  located  here:  /Library/Frame-
        works/Python.framework/Versions/3.6/bin/python3  If  it  is  not,   the
        directory must be changed in the run_headlister.sh script.
