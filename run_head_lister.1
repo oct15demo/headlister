@@ -1,0 +1,152 @@
+.de EX
+.nf
+.ft CW
+..
+.de EE
+.br
+.fi
+.ft 1
+..
+.TH run_head_lister.sh 1
+.CT 1 files prog_other
+.SH NAME
+run_head_lister.sh \-  output in data structure first lines of multiple .txt files until line length meets or exceeds threshold
+.SH SYNOPSIS
+.B run_head_lister.sh 
+[
+.BI \-h
+|
+.BI \-help
+]
+.I 'lines_per_file'
+[
+.I 'number_of_files' 
+|
+.B -a
+|
+.B --all
+]
+[
+.B -l 
+.I 'min_line_length'
+]
+[
+.B -i 
+.I 'input_file'
+]
+[
+.B -o 
+.I 'output_file'
+]
+[
+.B -ls-f
+]
+.SH DESCRIPTION
+.I run_head_lister.sh
+displays in a data structure the first lines of multiple .txt files until line length meets or exceeds threshold, each record includes the file name, a list of line lengths, and a list of the lines. Output can be saved to a file.
+
+The script generates a list of .txt files in the initialization line of a for loop, and inside the for loop, echoes the file name to the stream, uses head to limit the number of file names passed in the stream to the python utility head_lister.py. Thus run_head_lister.sh functions as a wrapper around head_lister.py
+
+
+The first and only required argument controls how many lines per file are processed, the second optional argument controls how many files are processed, use -a or --all to designate all files. The -l option sets a minimum threshold line length per file, which when reached causes the utility to stop processing more lines, regardless of the lines per file argument.
+
+run_head_lister.sh calls head_lister.py in three forms:
+
+ 1) If number_of_files is given, it uses head to limit the file list to that number of file names, and within the for loop for each file, echoes the file name, '==> file_name.txt <==', heads as many lines as passed as first argument, and adds a blank line following the last line output, for every file. 
+
+       for file in `ls  current_directory|grep "\.txt$"`; do echo "$file"; done|head -$number_of_files| \ 
+       /Library/Frameworks/Python.framework/Versions/$latest_version/bin/python3 ./head_lister.py stdin 1 0 stdout
+
+       or in a more readable form without displaying python directory of OSX and using the value of $number_of_files=1:
+
+       for file in `ls  txt_dir|grep "\.txt$"`; do echo "$file"; done|head -1| \ 
+       python3 dir/head_lister.py stdin 1 0 stdout
+
+
+There is a check in the script for the OSX python directory and latest version, if not found, the script just calls python.
+
+2) The second form of script omits the 'head -1|' or 'head -$number_of_files'
+
+3) The third form pass a file list
+
+       /Library/Frameworks/Python.framework/Versions/3.6/bin/python3 ./head_lister.py myin 1 0 stdout
+       
+       or again as a more readable version:
+ 
+       python3 dir/head_lister.py input_file 1 0 output_file
+
+
+In the absence of a number_of_files argument, only one file is processed. The min_line_length sets a threshold which after reaching halts processing more lines from a file. It is optional and absent that argument, all lines as set by lines_per_file will be processed. It is the head_lister.py that checks each line to see if it meets or exceeds the min_line_length if that option used.
+
+ Using the -ls-f option causes the ls command feeding file names to the pipeline to pass an unsorted list. Very large numbers of files in a directory (several hundred thousand) can greatly slow the script when the list is sorted.
+
+ The output of the script is a list of dictionaries, one dictionary record in the list for each file processed. Each dictionaray contains
+ { file_name: name of the file
+   lens : [ list of the length of every line saved ]
+   lines : [ list containing the text of each line ] }
+
+If there was a threshold the file lines didn't meet, the dictionary will contain an item with the length and index of the maximum length line read:
+    short_len: (31, 0)
+If the file contained less lines than lines_per_file to read, and reading wasn't interupted by meeting the threshold, the dictionary will contain an item with the number of lines read:
+    short_file: (6)
+
+ Output will also include a data strucure of meta data containing the parameters lines_per_file, number_of_files, min_line_length, and two lists { 'short_files': [ file_name_7, file_name_18, ...], 'short_lens': [(file_name_8, 100, 65),(file_name_23, 100, 87),...]} The first list of 'short_files' contains file names that didn't have as many lines that head_lister.py was attempting to process for each file, and not interupted by meeting a min threshold length. The second list of 'short_lens' contains the names of files where the threshold length was never met, along with the maximum line length that was found. If output was saved to a file, this meta data will also be saved to a file, with the designation '_meta.data' added to end of the file name. (If the data structure is saved to my_output_file, the meta data  will be  saved to the file my_output_file_meta.data)
+
+ The output file and input file parameters may include the file path, as in ~/data/my_input_file or ~/data/my_output_file
+
+.SH EXAMPLE
+
+$ run_head_lister.sh 3 3 
+set number_of_files=3
+lines_per_file  3
+number_of_files 3
+min_line_length 0
+input_file      stdin
+scripts dir=.
+total lines attempted to_read 9
+ arg[1] lines per file to process: 3
+ arg[2] line length threshold to halt saving lines: no min threshold
+{'file_name': '0000.txt\n', 'lens': [148, 65, 55], 'lines': ['[ Halliburton Oil Well Cementing Co. v. Walker Mr.Earl Babcock, of Duncan, Okl. (Harry C. Robb, of Washington, D.C., on the brief), for petitioner.\n', ' Mr. Harold W. Mattingly, of Los Angeles, Cal., for respondents.\n', ' Mr. Justice BLACK delivered the opinion of the Court.\n']}
+{'file_name': '0001.txt\n', 'lens': [101, 63, 57], 'lines': ['Rehearing Denied Dec. 16, 1946. See . Mr.Claude T. Barnes, of Salt Lake City, Utah, for petitioners.\n', ' Mr. Robert M. Hitchcock, of Washington, D.C., for respondent.\n', ' Mr. Justice DOUGLAS delivered the opinion of the Court.\n']}
+{'file_name': '0002.txt\n', 'lens': [31, 7, 179], 'lines': ['Rehearing Denied Dec. 16, 1946\n', ' See .\n', ' Appeal from the District Court of the United States for the Western District of Oklahoma. Messrs.Dan Moody, of Austin, Tex., and Harry O. Glasser, of Enid, Okla., for appellant.\n']}
+meta_data: {'total_lines': 9, 'file_count': 3, 'lines_per_file': 3}
+
+for file in `ls  current_dir|grep "\.txt$"`; do echo "$file"; done|head -3| \ 
+/Library/Frameworks/Python.framework/Versions/3.6/bin/python3 ./head_lister.py stdin 3 0 stdout
+
+for file in `ls  txt_dir|grep "\.txt$"`; do echo "$file"; done|head -3| \ 
+python3 dir/head_lister.py stdin 3 0 stdout
+
+
+
+$ run_head_lister.sh 3 3 -l 60
+set number_of_files=3
+set min_line_length=60
+lines_per_file  3
+number_of_files 3
+min_line_length 60
+input_file      stdin
+scripts dir=.
+total lines attempted to_read 9
+ arg[1] lines per file to process: 3
+ arg[2] line length threshold to halt saving lines: 60
+{'file_name': '0000.txt\n', 'lens': [148], 'threshold_line': 1, 'lines': ['[ Halliburton Oil Well Cementing Co. v. Walker Mr.Earl Babcock, of Duncan, Okl. (Harry C. Robb, of Washington, D.C., on the brief), for petitioner.\n']}
+{'file_name': '0001.txt\n', 'lens': [101], 'threshold_line': 1, 'lines': ['Rehearing Denied Dec. 16, 1946. See . Mr.Claude T. Barnes, of Salt Lake City, Utah, for petitioners.\n']}
+{'file_name': '0002.txt\n', 'lens': [31, 7, 179], 'lines': ['Rehearing Denied Dec. 16, 1946\n', ' See .\n', ' Appeal from the District Court of the United States for the Western District of Oklahoma. Messrs.Dan Moody, of Austin, Tex., and Harry O. Glasser, of Enid, Okla., for appellant.\n']}
+meta_data: {'total_lines': 5, 'file_count': 3, 'lines_per_file': 3, 'threshold_len': 60}
+
+for file in `ls  txt_dir|grep "\.txt$"`; do echo "$file"; done|head -3| \ 
+/Library/Frameworks/Python.framework/Versions/3.6/bin/python3 ./head_lister.py stdin 3 60 stdout
+
+for file in `ls  txt_dir|grep "\.txt$"`; do echo "$file"; done|head -3| \ 
+python3 dir/head_lister.py stdin 3 60 stdout
+
+.SH SEE ALSO
+
+ head (1), 
+.br
+.I
+.SH BUGS
+\&\f(CW\fP 
+Assumes on a Mac, python 3 is located here: /Library/Frameworks/Python.framework/Versions/3.6/bin/python3 If it is not, the directory must be changed in the run_headlister.sh script.
+.br
