@@ -45,14 +45,14 @@ run_head_lister.sh \-  output in data structure first lines of multiple .txt fil
 .I run_head_lister.sh
 displays in a data structure the first lines of multiple .txt files until line length meets or exceeds threshold, each record includes the file name, a list of line lengths, and a list of the lines. Output can be saved to a file.
 
-The script generates a list of .txt files in the initialization line of a for loop, and inside the for loop, echoes the file name to the stream, uses head to limit the number of file names passed in the stream to the python utility head_lister.py. Thus run_head_lister.sh functions as a wrapper around head_lister.py
+The script generates a list of .txt files in the initialization line of a for loop, and inside the for loop, echoes the file name to the stream, uses head to limit the number of file names passed in the stream to the python utility head_lister.py. Thus run_head_lister.sh functions as a wrapper around head_lister.py, interprets args passed and supplies defaults (vs using argparse in python). 
 
 
 The first and only required argument controls how many lines per file are processed, the second optional argument controls how many files are processed, use -a or --all to designate all files. The -l option sets a minimum threshold line length per file, which when reached causes the utility to stop processing more lines, regardless of the lines per file argument.
 
 run_head_lister.sh calls head_lister.py in three forms:
 
- 1) If number_of_files is given, it uses head to limit the file list to that number of file names, and within the for loop for each file, echoes the file name, '==> file_name.txt <==', heads as many lines as passed as first argument, and adds a blank line following the last line output, for every file. 
+ 1) If number_of_files is given, it uses head to limit the file list to that number of file names within the for loop piping the file name with echo first. The piped output of the for loop is passed to the python utility head_lister.py which by default reads from stdin.
 
        for file in `ls  current_directory|grep "\.txt$"`; do echo "$file"; done|head -$number_of_files| \ 
        /Library/Frameworks/Python.framework/Versions/$latest_version/bin/python3 ./head_lister.py stdin 1 0 stdout
@@ -67,9 +67,9 @@ There is a check in the script for the OSX python directory and latest version, 
 
 2) The second form of script omits the 'head -1|' or 'head -$number_of_files'
 
-3) The third form pass a file list
+3) The third form passes a file list
 
-       /Library/Frameworks/Python.framework/Versions/3.6/bin/python3 ./head_lister.py myin 1 0 stdout
+       /Library/Frameworks/Python.framework/Versions/3.6/bin/python3 ./head_lister.py /some_dir/my_input_file 1 0 stdout
        
        or again as a more readable version:
  
@@ -87,6 +87,7 @@ In the absence of a number_of_files argument, only one file is processed. The mi
 
 If there was a threshold the file lines didn't meet, the dictionary will contain an item with the length and index of the maximum length line read:
     short_len: (31, 0)
+
 If the file contained less lines than lines_per_file to read, and reading wasn't interupted by meeting the threshold, the dictionary will contain an item with the number of lines read:
     short_file: (6)
 
