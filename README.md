@@ -18,27 +18,26 @@
        record includes the file name, a list of line lengths, and  a  list  of
        the lines. Output can be saved to a file.
 
-       The script generates a list of .txt files in the initialization line of
-       a for loop, and inside the for  loop,  echoes  the  file  name  to  the
-       stream,  uses  head  to  limit  the  number of file names passed in the
-       stream to the python utility  head_lister.py.  Thus  run_head_lister.sh
-       functions as a wrapper around head_lister.py
+       The script generates a list of .txt files in the initialization line  of 
+       a for loop, and inside the for loop, echoes the file name to the stream, 
+       uses head to limit the number of file names passed in the stream to  the 
+       python utility  head_lister.py.  Thus  run_head_lister.sh  functions  as  
+       a  wrapper  around  head_lister.py,  interprets args passed and supplies 
+       defaults (vs using argparse in python). 
 
-
-       The  first  and only required argument controls how many lines per file
-       are processed, the second optional argument controls how many files are
-       processed, use -a or --all to designate all files. The -l option sets a
-       minimum threshold line length per file, which when reached  causes  the
-       utility to stop processing more lines, regardless of the lines per file
+       The  first  and  only required argument controls how many lines per file
+       are processed, the  second optional argument controls how many files are
+       processed,  use -a or --all to designate all files. The -l option sets a
+       minimum  threshold line length per file, which when reached  causes  the
+       utility to stop  processing more lines, regardless of the lines per file
        argument.
 
        run_head_lister.sh calls head_lister.py in three forms:
 
-        1) If number_of_files is given, it uses head to limit the file list to
-       that  number  of  file  names,  and  within the for loop for each file,
-       echoes the file name, '==> file_name.txt <==', heads as many  lines  as
-       passed as first argument, and adds a blank line following the last line
-       output, for every file.
+        1)  If number_of_files is given, it uses head to limit the file list to 
+        that number of file names within the for loop piping the file name with 
+        echo  first.  The  piped output of the for loop is passed to the python 
+        utility head_lister.py which by default reads from stdin.
 
     for  file  in  `ls   current_directory|grep  ".txt$"`;  do  echo "$file"; done|head -$number_of_files| 
     /Library/Frameworks/Python.framework/Versions/$latest_version/bin/python3 ./head_lister.py stdin 1 0 stdout
@@ -52,7 +51,7 @@
 
        3) The third form passes a file list
 
-    /Library/Frameworks/Python.framework/Versions/3.6/bin/python3 ./head_lister.py myin 1 0 stdout
+    /Library/Frameworks/Python.framework/Versions/3.6/bin/python3 ./head_lister.py /dir/nput_file 1 0 stdout
 
     or again as a more readable version:
 
