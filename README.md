@@ -51,7 +51,7 @@
 
        3) The third form passes a file list
 
-    /Library/Frameworks/Python.framework/Versions/3.6/bin/python3 ./head_lister.py /dir/nput_file 1 0 stdout
+    /Library/Frameworks/Python.framework/Versions/3.6/bin/python3 ./head_lister.py /dir/input_file 1 0 stdout
 
     or again as a more readable version:
 
